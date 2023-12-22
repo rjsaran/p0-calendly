@@ -21,6 +21,12 @@ export class UserController implements IUserController {
     return user;
   }
 
+  async getAllUsers(): Promise<Array<User>> {
+    const users = await this.userService.getAllUsers();
+
+    return users;
+  }
+
   async createUser(user: CreateUserRequest): Promise<User> {
     const newUser = await this.userService.createUser(user);
 

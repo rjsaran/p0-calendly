@@ -19,6 +19,10 @@ export class UserService implements IUserService {
     return this.userRepository.getUser(userId);
   }
 
+  async getAllUsers(): Promise<Array<User>> {
+    return this.userRepository.getAllUsers();
+  }
+
   async createUser(userRequest: CreateUserRequest): Promise<User> {
     const newUser = User.fromCreateRequest(userRequest);
 

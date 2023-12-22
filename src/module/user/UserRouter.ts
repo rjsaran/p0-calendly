@@ -18,6 +18,18 @@ export class UserRouter {
   register(): Router {
     const router = express.Router();
 
+    router.get('/', async (_req: Request, res: Response) => {
+      const response = await this.userController.getAllUsers();
+
+      res.json({
+        paging: {
+          count: response.length,
+          nextCursor: null,
+        }, // For Pagination Support
+        data: classToPlain(response),
+      });
+    });
+
     router.get('/:id', async (req: Request, res: Response) => {
       const userId = req.params.id;
 

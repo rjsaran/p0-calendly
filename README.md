@@ -39,6 +39,46 @@ After submission, we will conduct a 30 to 60 minute code review in person. We wi
 
 # Solution
 
+## How to run application
+
+### Local Environment:
+
+#### a. Clone git repo
+
+```sh
+git clone https://github.com/rjsaran/p0-calendly.git
+```
+
+#### b. If docker is available, Run below steps
+
+```sh
+docker-compose up
+```
+
+#### c. If docker is not installed, Run
+
+```sh
+npm install
+
+npm run build
+
+node run start
+```
+
+## How to test APIs
+
+Local Host:
+
+```sh
+http://127.0.0.1:3000
+```
+
+Heroku Host:
+
+`sh
+https://calendly-ec16681f4e77.herokuapp.com
+`
+
 ## APIs
 
 #### 1. Create new user
