@@ -12,7 +12,7 @@ import { ScheduleOverlapRequest } from './model/ScheduleOverlapRequest';
 export class ScheduleRouter {
   constructor(
     @inject(IScheduleControllerToken)
-    private scheudlController: IScheduleController
+    private scheduleController: IScheduleController
   ) {}
 
   register(): Router {
@@ -24,11 +24,17 @@ export class ScheduleRouter {
         req.body
       );
 
-      const response = await this.scheudlController.findOverlapSchedule(
+      const response = await this.scheduleController.findOverlapSchedule(
         findOverlapScheduleRequest
       );
 
-      res.json(classToPlain(response));
+      res.json({
+        paging: {
+          count: response.length,
+          nextCursor: null,
+        },
+        data: classToPlain(response),
+      });
     });
 
     return router;

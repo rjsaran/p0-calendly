@@ -25,11 +25,11 @@ export class AvailabilityRepository implements IAvailabilityRepository {
 
     if (!availabilityList || !availabilityList.length) return null;
 
-    const availability = plainToClass(Availability, availabilityList[0], {
-      enableImplicitConversion: true,
-    });
+    // There might be multiple availability settings for a user,
+    // always referring to first here
+    const userAvailability = availabilityList[0];
 
-    return availability;
+    return plainToClass(Availability, userAvailability);
   }
 
   async createAvailability(

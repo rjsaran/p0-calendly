@@ -17,7 +17,7 @@ export class UserRepository implements IUserRepository {
   }
 
   async getAllUsers(): Promise<Array<User>> {
-    const userIds = Object.keys(this.userMap);
+    const userIds = Array.from(this.userMap.keys());
 
     return userIds.map((userId) => {
       return plainToClass(User, this.userMap.get(userId));

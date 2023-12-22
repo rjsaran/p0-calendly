@@ -52,6 +52,8 @@ git clone https://github.com/rjsaran/p0-calendly.git
 #### b. If docker is available, Run below steps
 
 ```sh
+docker-compose build
+
 docker-compose up
 ```
 
@@ -122,7 +124,31 @@ Response Body:
 }
 ```
 
-#### 3. Create availability for a user
+#### 3. Get all users
+
+```http
+GET /v1/user
+```
+
+Response Body:
+
+```json
+{
+  "paging": {
+    "count": 1,
+    "nextCursor": null
+  },
+  "data": [
+    {
+      "id": "usr_202312222110558965",
+      "name": "Ramjeet Saran",
+      "email": "saran.ramjeet@gmail.com"
+    }
+  ]
+}
+```
+
+#### 4. Create availability for a user
 
 ```http
 POST /v1/availability
@@ -279,7 +305,7 @@ Response Body:
 }
 ```
 
-#### 4. Get availability by id
+#### 5. Get availability by id
 
 ```http
 GET /v1/availability/avl_202312222251339338
@@ -357,7 +383,7 @@ Response Body:
 }
 ```
 
-#### 5. Find overlap intervals between multiple users
+#### 6. Find overlap intervals between multiple users
 
 ```http
 POST /v1/schedule/findOverlap
@@ -376,73 +402,79 @@ userIds: Ids of user
 Response Body:
 
 ```json
-[
-  {
-    "date": "2023-12-18",
-    "intervals": [
-      {
-        "from": "09:00",
-        "to": "17:00"
-      }
-    ]
+{
+  "paging": {
+    "count": 7,
+    "nextCursor": null
   },
-  {
-    "date": "2023-12-19",
-    "intervals": [
-      {
-        "from": "09:00",
-        "to": "17:00"
-      }
-    ]
-  },
-  {
-    "date": "2023-12-20",
-    "intervals": [
-      {
-        "from": "09:00",
-        "to": "17:00"
-      }
-    ]
-  },
-  {
-    "date": "2023-12-21",
-    "intervals": [
-      {
-        "from": "09:00",
-        "to": "17:00"
-      }
-    ]
-  },
-  {
-    "date": "2023-12-22",
-    "intervals": [
-      {
-        "from": "12:00",
-        "to": "13:00"
-      },
-      {
-        "from": "18:00",
-        "to": "19:00"
-      }
-    ]
-  },
-  {
-    "date": "2023-12-23",
-    "intervals": []
-  },
-  {
-    "date": "2023-12-24",
-    "intervals": [
-      {
-        "from": "10:00",
-        "to": "12:00"
-      }
-    ]
-  }
-]
+  "data": [
+    {
+      "intervals": [
+        {
+          "from": "09:00",
+          "to": "17:00"
+        }
+      ],
+      "date": "2023-12-18"
+    },
+    {
+      "intervals": [
+        {
+          "from": "09:00",
+          "to": "17:00"
+        }
+      ],
+      "date": "2023-12-19"
+    },
+    {
+      "intervals": [
+        {
+          "from": "09:00",
+          "to": "17:00"
+        }
+      ],
+      "date": "2023-12-20"
+    },
+    {
+      "intervals": [
+        {
+          "from": "09:00",
+          "to": "17:00"
+        }
+      ],
+      "date": "2023-12-21"
+    },
+    {
+      "intervals": [
+        {
+          "from": "12:00",
+          "to": "13:00"
+        },
+        {
+          "from": "18:00",
+          "to": "19:00"
+        }
+      ],
+      "date": "2023-12-22"
+    },
+    {
+      "intervals": [],
+      "date": "2023-12-23"
+    },
+    {
+      "intervals": [
+        {
+          "from": "10:00",
+          "to": "14:00"
+        }
+      ],
+      "date": "2023-12-24"
+    }
+  ]
+}
 ```
 
-#### 6. Update availability by id
+#### 7. Update availability by id
 
 ```http
 PUT /v1/availability/avl_202312222251339338
