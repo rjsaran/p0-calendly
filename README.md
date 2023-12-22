@@ -81,6 +81,36 @@ Heroku Host:
 https://calendly-ec16681f4e77.herokuapp.com
 `
 
+## Project Structure
+
+.
+
+- [dist](./dist) - Build
+
+- [src](./src) - Source code
+
+  - [http](./src/http)
+    - [exception](./src/http/exception) - HTTP Exception, Request Error Handler
+    - [server](./src/http/server) - Express Server, Base Router
+  - [module](./src/module/) - Contains core components of application
+
+    - [availability](./src/module/availability) - Set, Show, Update availability
+      - [controller](./src/module/availability/controller)
+      - [model](./src/module/availability/model) - Domain, Classes
+      - [repository](./src/module/availability/repository) - Database intrection
+      - [service](./src/module/availability/service) - Core business logic
+    - [schedule](./src/module/schedule) - Find overlap b/w users availability
+      - [controller](./src/module/schedule/controller)
+      - [model](./src/module/schedule/model)
+      - [service](./src/module/schedule/service)
+    - [user](./src/module/user) - Create, Read, user
+      - [controller](./src/module/user/controller)
+      - [model](./src/module/user/model)
+      - [repository](./src/module/user/repository)
+      - [service](./src/module/user/service)
+
+  - [utils](./src/utils) - Random, ID Generator, Overlap finder algoritm
+
 ## APIs
 
 #### 1. Create new user
