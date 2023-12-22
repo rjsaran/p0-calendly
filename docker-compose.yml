@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  calendly-backend:
+    container_name: calendly-backend
+    build: ./
+    ports:
+      - "3000:3000"
+
