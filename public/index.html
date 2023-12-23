@@ -84,10 +84,10 @@
     <h2>Create New User</h2>
     <form id="createUserForm">
         <label for="userName">Name:</label>
-        <input type="text" id="userName" required>
+        <input type="text" id="userName" value="Ramjeet Saran" required>
 
         <label for="userEmail">Email:</label>
-        <input type="email" id="userEmail" required>
+        <input type="email" id="userEmail" value="saran.ramjeet@gmail.com" required>
 
         <button type="button" onclick="createUser()">Create User</button>
     </form>
@@ -153,7 +153,6 @@
 
     <!-- Display Overlap Result -->
     <h2>Result:</h2>
-    <!-- <div id="getAvailabilityResult"></div> -->
     <pre id="getAvailabilityResult"></pre>
 
     <hr>
@@ -161,14 +160,12 @@
     <script>
         let users = [];
 
-        const apiBaseUrl = 'https://calendly-ec16681f4e77.herokuapp.com';
-
         async function createUser() {
             const userName = document.getElementById('userName').value;
             const userEmail = document.getElementById('userEmail').value;
 
             try {
-                const response = await fetch(`${apiBaseUrl}/v1/user`, {
+                const response = await fetch(`/v1/user`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -189,7 +186,7 @@
             const userId = document.getElementById('userId').value;
 
             try {
-                const response = await fetch(`${apiBaseUrl}/v1/user/${userId}`);
+                const response = await fetch(`/v1/user/${userId}`);
                 const data = await response.json();
                 console.log(`GET /v1/user/${userId} response:`, data);
 
@@ -202,7 +199,7 @@
 
         async function getAllUsers() {
             try {
-                const response = await fetch(`${apiBaseUrl}/v1/user`);
+                const response = await fetch(`/v1/user`);
                 const data = await response.json();
 
                 // Display the list of users in the table
@@ -236,7 +233,7 @@
             const availabilityDate = JSON.parse(document.getElementById('availabilityDate').value);
 
             try {
-                const response = await fetch(`${apiBaseUrl}/v1/availability`, {
+                const response = await fetch(`/v1/availability`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -256,7 +253,7 @@
             const userId = document.getElementById('getAvailabilityUserId').value;
 
             try {
-                const response = await fetch(`${apiBaseUrl}/v1/availability/user/${userId}`);
+                const response = await fetch(`/v1/availability/user/${userId}`);
                 const data = await response.json();
                 console.log(`GET /v1/availability/user/${userId} response:`, data);
 
@@ -272,7 +269,7 @@
             const selectedRow = event.target.closest('tr');
             if (selectedRow) {
                 const userId = selectedRow.getAttribute('data-userid');
-                fetch(`${apiBaseUrl}/v1/user/${userId}`)
+                fetch(`/v1/user/${userId}`)
                     .then(response => response.json())
                     .then(data => {
                         displayUserDetails(data);
@@ -319,7 +316,7 @@
             const user2 = document.getElementById('user2').value;
 
             try {
-                const response = await fetch(`${apiBaseUrl}/v1/schedule/findOverlap`, {
+                const response = await fetch(`/v1/schedule/findOverlap`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
