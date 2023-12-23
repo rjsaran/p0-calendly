@@ -1,6 +1,7 @@
 import 'express-async-errors';
 
 import { injectable } from 'inversify';
+import path from 'path';
 
 import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
@@ -18,8 +19,8 @@ export class ExpressServer implements IServer {
   async start(): Promise<void> {
     const router = express.Router();
 
-    router.get('/', (_req: Request, res: Response) => {
-      return res.json({ message: 'Welcome to Calendly' });
+    router.get('/', async (_req, res) => {
+      res.sendFile(path.join(__dirname, '../../../', 'public', 'index.html'));
     });
 
     router.get('/health', (_req: Request, res: Response) => {
