@@ -8,6 +8,8 @@ export const IAvailabilityServiceToken = Symbol('IAvailabilityService');
 export interface IAvailabilityService {
   getAvailability(availabilityId: string): Promise<Availability | null>;
 
+  getAvailabilityByUser(userId: string): Promise<Availability | null>;
+
   createAvailability(
     availability: CreateAvailabilityRequest
   ): Promise<Availability>;

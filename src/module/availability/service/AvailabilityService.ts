@@ -22,6 +22,10 @@ export class AvailabilityService implements IAvailabilityService {
     return this.availabilityRepository.getAvailabilityById(availabilityId);
   }
 
+  async getAvailabilityByUser(userId: string): Promise<Availability | null> {
+    return this.availabilityRepository.getAvailabilityByUser(userId);
+  }
+
   async createAvailability(
     createAvailabilityRequest: CreateAvailabilityRequest
   ): Promise<Availability> {

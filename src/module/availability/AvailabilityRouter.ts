@@ -29,6 +29,16 @@ export class AvailabilityRouter {
       res.json(classToPlain(response));
     });
 
+    router.get('/user/:userId', async (req: Request, res: Response) => {
+      const { userId } = req.params;
+
+      const response = await this.availabilityController.getAvailabilityByUser(
+        userId
+      );
+
+      res.json(classToPlain(response));
+    });
+
     router.post('/', async (req: Request, res: Response) => {
       const createAvailabilityRequest = plainToClass(
         CreateAvailabilityRequest,

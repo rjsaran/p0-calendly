@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendly Simulator</title>
+
+    <style>
+        pre {
+            white-space: pre-wrap;
+            font-family: monospace;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f8f8f8;
+        }
+    
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        textarea {
+            width: 30%;
+            height: 200px; /* Adjust the height as needed */
+        }
+  </style>
+</head>
+<body>
+
+    <h1>Calendly Simulator</h1>    
+
+    <!-- Get All Users Button -->
+    <h2>List All Users</h2>
+    <button type="button" onclick="getAllUsers()">Get All Users</button>
+    
+    <!-- Users Table -->
+    <h2>Result:</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Name</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody id="userList" onclick="showUserDetails(event)"></tbody>
+    </table>
+
+    <hr>
+
+    <!-- Get User By ID Form -->
+    <h2>Get User By ID</h2>
+    <form id="getUserForm">
+        <label for="userId">User ID:</label>
+        <select id="userId" onclick="populateUserDropdown('userId')" required></select>
+
+        <button type="button" onclick="getUserById()">Get User</button>
+    </form>
+
+    <!-- User Details Section -->
+    <div id="userDetails">
+        <h2>Result:</h2>
+        <p id="selectedUserName">Name: </p>
+        <p id="selectedUserEmail">Email: </p>
+    </div>
+
+    <hr>
+  
+    <h2>Create New User</h2>
+    <form id="createUserForm">
+        <label for="userName">Name:</label>
+        <input type="text" id="userName" required>
+
+        <label for="userEmail">Email:</label>
+        <input type="email" id="userEmail" required>
+
+        <button type="button" onclick="createUser()">Create User</button>
+    </form>
+
+    <hr>
+  
+    <!-- Create User Availability Form -->
+    <h2>Create User Availability</h2>
+    <form id="createAvailabilityForm">
+        <label for="availabilityName">Name:</label>
+        <input type="text" id="availabilityName" value="Working Hours" required>
+
+        <label for="availabilityUserId">User ID:</label>
+        <select id="availabilityUserId" onclick="populateUserDropdown('availabilityUserId')" required></select>
+
+        <label for="availabilityWeek">Week Specific:</label>
+        <textarea id="availabilityWeek" rows="4" value="[]" required></textarea>
+
+        <label for="availabilityDate">Date Specific:</label>
+        <textarea id="availabilityDate" rows="4"  value="[]" required></textarea>
+
+        <button type="button" onclick="createUserAvailability()">Create Availability</button>
+    </form>
+
+    <hr>
+
+    <h2>Overlap Finder</h2>
+
+    <!-- User ID Selection Form -->
+    <form id="userIdSelectionForm">
+        <label for="user1">Select User 1:</label>
+        <select id="user1" onclick="populateUserDropdown('user1')" required></select>
+
+        <label for="user2">Select User 2:</label>
+        <select id="user2" onclick="populateUserDropdown('user2')" required></select>
+
+        <button type="button" onclick="findOverlap()">Find Overlap</button>
+    </form>
+
+
+    <!-- Display Overlap Result -->
+    <h2>Result:</h2>
+    <table id="overlapResultTable">
+        <thead>
+            <tr>
+                <th>Intervals</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+    </table>
+
+    <hr>
+
+    <!-- Get User Availability Form -->
+    <h2>Get User Availability</h2>
+    <form id="getAvailabilityForm">
+        <label for="getAvailabilityUserId">User ID:</label>
+        <select id="getAvailabilityUserId" onclick="populateUserDropdown('getAvailabilityUserId')" required></select>
+
+        <button type="button" onclick="getUserAvailability()">Get Availability</button>
+    </form>
+
+
+    <!-- Display Overlap Result -->
+    <h2>Result:</h2>
+    <!-- <div id="getAvailabilityResult"></div> -->
+    <pre id="getAvailabilityResult"></pre>
+
+    <hr>
+
+    <script>
+        let users = [];
+
+        const apiBaseUrl = 'https://calendly-ec16681f4e77.herokuapp.com';
+
+        async function createUser() {
+            const userName = document.getElementById('userName').value;
+            const userEmail = document.getElementById('userEmail').value;
+
+            try {
+                const response = await fetch(`${apiBaseUrl}/v1/user`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name: userName, email: userEmail }),
+                });
+
+                const data = await response.json();
+                console.log('POST /v1/user response:', data);
+
+                await getAllUsers();
+            } catch (error) {
+                console.error('Error creating user:', error);
+            }
+        }
+
+        async function getUserById() {
+            const userId = document.getElementById('userId').value;
+
+            try {
+                const response = await fetch(`${apiBaseUrl}/v1/user/${userId}`);
+                const data = await response.json();
+                console.log(`GET /v1/user/${userId} response:`, data);
+
+                // Display user details
+                displayUserDetails(data);
+            } catch (error) {
+                console.error('Error getting user by ID:', error);
+            }
+        }
+
+        async function getAllUsers() {
+            try {
+                const response = await fetch(`${apiBaseUrl}/v1/user`);
+                const data = await response.json();
+
+                // Display the list of users in the table
+                const userList = document.getElementById('userList');
+                userList.innerHTML = data.data.map(user => `
+                    <tr data-userid="${user.id}">
+                        <td>${user.id}</td>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                    </tr>`).join('');
+
+                // Clear user details
+                clearUserDetails();
+
+                users = [];
+
+                data.data.forEach(user => {
+                  users.push(user);
+                })
+
+                return data.data;
+            } catch (error) {
+                console.error('Error getting all users:', error);
+            }
+        }
+
+        async function createUserAvailability() {
+            const availabilityName = document.getElementById('availabilityName').value;
+            const availabilityUserId = document.getElementById('availabilityUserId').value;
+            const availabilityWeek = JSON.parse(document.getElementById('availabilityWeek').value);
+            const availabilityDate = JSON.parse(document.getElementById('availabilityDate').value);
+
+            try {
+                const response = await fetch(`${apiBaseUrl}/v1/availability`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name: availabilityName, userId: availabilityUserId, week: availabilityWeek, date: availabilityDate }),
+                });
+
+                const data = await response.json();
+                console.log('POST /v1/availability response:', data);
+                alert("User Availability Creation Success!");
+            } catch (error) {
+                console.error('Error creating user availability:', error);
+            }
+        }
+
+        async function getUserAvailability() {
+            const userId = document.getElementById('getAvailabilityUserId').value;
+
+            try {
+                const response = await fetch(`${apiBaseUrl}/v1/availability/user/${userId}`);
+                const data = await response.json();
+                console.log(`GET /v1/availability/user/${userId} response:`, data);
+
+                document.getElementById('getAvailabilityResult').textContent = JSON.stringify(data, null, 2);
+
+            } catch (error) {
+                console.error('Error getting user availability:', error);
+            }
+        }
+
+        // Function to show user details when clicking a row in the table
+        function showUserDetails(event) {
+            const selectedRow = event.target.closest('tr');
+            if (selectedRow) {
+                const userId = selectedRow.getAttribute('data-userid');
+                fetch(`${apiBaseUrl}/v1/user/${userId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        displayUserDetails(data);
+                    })
+                    .catch(error => {
+                        console.error('Error getting user details:', error);
+                    });
+            }
+        }
+
+        // Function to display user details in the "User Details" section
+        function displayUserDetails(user) {
+            const selectedUserName = document.getElementById('selectedUserName');
+            const selectedUserEmail = document.getElementById('selectedUserEmail');
+
+            selectedUserName.textContent = `Name: ${user.name}`;
+            selectedUserEmail.textContent = `Email: ${user.email}`;
+        }
+
+        // Function to clear user details in the "User Details" section
+        function clearUserDetails() {
+            const selectedUserName = document.getElementById('selectedUserName');
+            const selectedUserEmail = document.getElementById('selectedUserEmail');
+
+            selectedUserName.textContent = 'Name: ';
+            selectedUserEmail.textContent = 'Email: ';
+        }
+
+        async function populateUserDropdown(dropdownId) {
+          const dropdown = document.getElementById(dropdownId);
+
+          users.forEach((user) => {
+            if (!dropdownContainsValue(dropdown, user.id)) {
+              const option = document.createElement('option');
+              option.value = user.id; 
+              option.text = user.name;
+              dropdown.add(option);
+            }
+          });
+        }
+
+        async function findOverlap() {
+            const user1 = document.getElementById('user1').value;
+            const user2 = document.getElementById('user2').value;
+
+            try {
+                const response = await fetch(`${apiBaseUrl}/v1/schedule/findOverlap`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ userIds: [user1, user2]}),
+                });
+
+                const data = await response.json();
+                console.log(`GET /v1/schedule/findOverlap response:`, data);
+
+                displayOverlapResult(data.data);
+            } catch (error) {
+                console.error('Error getting overlap:', error);
+            }
+        }
+
+        function displayOverlapResult(overlapResult) {
+            const overlapResultTable = document.getElementById("overlapResultTable");
+        
+            const existingTBody = overlapResultTable.tBodies[0];
+            if (existingTBody) {
+                existingTBody.remove();
+            }
+
+            const tbody = overlapResultTable.createTBody();
+
+            overlapResult.forEach(item => {
+                const row = tbody.insertRow();
+                Object.entries(item).forEach(([key, value]) => {
+                    const cell = row.insertCell();
+                    if (key == 'date') {
+                        cell.textContent = value;
+                    } else if (key === 'intervals') {
+                        value.forEach((interval, index) => {
+                            if (index > 0) {
+                                cell.appendChild(document.createElement('br'));
+                            }
+                            cell.appendChild(document.createTextNode(`${interval.from} - ${interval.to}`));
+                        });
+                    } 
+                });
+            });
+        }
+
+        function dropdownContainsValue(dropdown, value) {
+            for (let i = 0; i < dropdown.options.length; i++) {
+                if (dropdown.options[i].value === value) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        getAllUsers();
+    </script>
+
+</body>
+</html>

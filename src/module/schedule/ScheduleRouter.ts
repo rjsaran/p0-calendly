@@ -18,7 +18,7 @@ export class ScheduleRouter {
   register(): Router {
     const router = express.Router();
 
-    router.get('/findOverlap', async (req: Request, res: Response) => {
+    router.all('/findOverlap', async (req: Request, res: Response) => {
       const findOverlapScheduleRequest = plainToClass(
         ScheduleOverlapRequest,
         req.body

@@ -7,6 +7,8 @@ export const IAvailabilityControllerToken = Symbol('IAvailabilityController');
 export interface IAvailabilityController {
   getAvailability(availabilityId: string): Promise<Availability>;
 
+  getAvailabilityByUser(userId: string): Promise<Availability>;
+
   createAvailability(
     availability: CreateAvailabilityRequest
   ): Promise<Availability>;

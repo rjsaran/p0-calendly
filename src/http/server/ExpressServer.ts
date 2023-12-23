@@ -4,6 +4,8 @@ import { injectable } from 'inversify';
 
 import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
+import cors from 'cors';
+
 import { NotFoundException } from '../exception/NotFoundException';
 import { ErrorHandler } from '../exception/ErrorHandler';
 import { V1Router } from './ExpressV1Router';
@@ -25,6 +27,14 @@ export class ExpressServer implements IServer {
     });
 
     const app = express();
+
+    const corsOptions = {
+      origin: '*',
+      credentials: true,
+      optionSuccessStatus: 200,
+    };
+
+    app.use(cors(corsOptions));
 
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));

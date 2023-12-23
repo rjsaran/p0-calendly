@@ -413,7 +413,85 @@ Response Body:
 }
 ```
 
-#### 6. Find overlap intervals between multiple users
+#### 6. Get availability for a user
+
+```http
+GET /v1/availability/user/usr_202312221339245673
+```
+
+Response Body:
+
+```json
+{
+  "id": "avl_202312222251339338",
+  "name": "Default",
+  "userId": "usr_202312221339245673",
+  "week": [
+    {
+      "intervals": [
+        {
+          "from": "10:00",
+          "to": "14:00"
+        }
+      ],
+      "weekDay": 0
+    },
+    {
+      "intervals": [
+        {
+          "from": "09:00",
+          "to": "17:00"
+        }
+      ],
+      "weekDay": 1
+    },
+    {
+      "intervals": [
+        {
+          "from": "09:00",
+          "to": "17:00"
+        }
+      ],
+      "weekDay": 2
+    },
+    {
+      "intervals": [
+        {
+          "from": "09:00",
+          "to": "17:00"
+        }
+      ],
+      "weekDay": 3
+    },
+    {
+      "intervals": [
+        {
+          "from": "09:00",
+          "to": "17:00"
+        }
+      ],
+      "weekDay": 4
+    }
+  ],
+  "date": [
+    {
+      "intervals": [
+        {
+          "from": "12:00",
+          "to": "13:00"
+        },
+        {
+          "from": "18:00",
+          "to": "19:00"
+        }
+      ],
+      "date": "2023-12-22"
+    }
+  ]
+}
+```
+
+#### 7. Find overlap intervals between multiple users
 
 ```http
 POST /v1/schedule/findOverlap
@@ -504,7 +582,7 @@ Response Body:
 }
 ```
 
-#### 7. Update availability by id
+#### 8. Update availability by id
 
 ```http
 PUT /v1/availability/avl_202312222251339338

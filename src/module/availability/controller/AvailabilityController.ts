@@ -27,6 +27,16 @@ export class AvailabilityController implements IAvailabilityController {
     return availability;
   }
 
+  async getAvailabilityByUser(userId: string): Promise<Availability> {
+    const availability = await this.availabilityService.getAvailabilityByUser(
+      userId
+    );
+
+    if (!availability) throw new NotFoundException('Availability not found');
+
+    return availability;
+  }
+
   async createAvailability(
     createAvailabilityRequest: CreateAvailabilityRequest
   ): Promise<Availability> {
