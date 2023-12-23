@@ -44,44 +44,24 @@
 
     <h1>Calendly Simulator</h1>    
 
-    <!-- Get All Users Button -->
-    <h2>List All Users</h2>
-    <button type="button" onclick="getAllUsers()">Get All Users</button>
-    
-    <!-- Users Table -->
-    <h2>Result:</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>User ID</th>
-                <th>Name</th>
-                <th>Email</th>
-            </tr>
-        </thead>
-        <tbody id="userList" onclick="showUserDetails(event)"></tbody>
-    </table>
+    <p>Choose one user from below list, if list is empty, register new user</p>
+    <select id="sessionUserId" onclick="populateUserDropdown('sessionUserId')">
+        <option value="" disabled selected>--- Select ---</option>
+    </select>
 
-    <hr>
-
-    <!-- Get User By ID Form -->
-    <h2>Get User By ID</h2>
-    <form id="getUserForm">
-        <label for="userId">User ID:</label>
-        <select id="userId" onclick="populateUserDropdown('userId')" required></select>
-
-        <button type="button" onclick="getUserById()">Get User</button>
-    </form>
+    <button onclick="setSessionUserId()">Change User</button>
 
     <!-- User Details Section -->
     <div id="userDetails">
-        <h2>Result:</h2>
+        <h3>Your Profile:</h3>
+        <p id="selectedUserId">User ID: </p>
         <p id="selectedUserName">Name: </p>
         <p id="selectedUserEmail">Email: </p>
     </div>
 
     <hr>
   
-    <h2>Create New User</h2>
+    <h2>Register new user</h2>
     <form id="createUserForm">
         <label for="userName">Name:</label>
         <input type="text" id="userName" value="Ramjeet Saran" required>
@@ -89,19 +69,16 @@
         <label for="userEmail">Email:</label>
         <input type="email" id="userEmail" value="saran.ramjeet@gmail.com" required>
 
-        <button type="button" onclick="createUser()">Create User</button>
+        <button type="button" onclick="createUser()">Register</button>
     </form>
 
     <hr>
   
     <!-- Create User Availability Form -->
-    <h2>Create User Availability</h2>
+    <h2>Set your availability</h2>
     <form id="createAvailabilityForm">
         <label for="availabilityName">Name:</label>
         <input type="text" id="availabilityName" value="Working Hours" required>
-
-        <label for="availabilityUserId">User ID:</label>
-        <select id="availabilityUserId" onclick="populateUserDropdown('availabilityUserId')" required></select>
 
         <label for="availabilityWeek">Week Specific:</label>
         <textarea id="availabilityWeek" value="[]" required></textarea>
@@ -109,27 +86,43 @@
         <label for="availabilityDate">Date Specific:</label>
         <textarea id="availabilityDate"  value="[]" required></textarea>
 
-        <button type="button" onclick="createUserAvailability()">Create Availability</button>
+        <button type="button" onclick="createUserAvailability()">Set availability</button>
     </form>
 
     <hr>
 
-    <h2>Overlap Finder</h2>
+    <!-- Get User Availability Form -->
+    <h2>View current availability</h2>
+    <form id="getAvailabilityForm">
+        <button type="button" onclick="getUserAvailability()">Show availability</button>
+    </form>
+
+
+    <!-- Display Overlap Result -->
+    <pre id="getAvailabilityResult"></pre>
+
+    <hr>
+
+    <h2>Overlap finder</h2>
 
     <!-- User ID Selection Form -->
     <form id="userIdSelectionForm">
-        <label for="user1">Select User 1:</label>
-        <select id="user1" onclick="populateUserDropdown('user1')" required></select>
+        <label for="user2">Select user to find overlap with:</label>
+        <select id="user2" onclick="populateUserDropdown('user2')" required>
+            <option value="" disabled selected>--- Select ---</option>
+        </select>
 
-        <label for="user2">Select User 2:</label>
-        <select id="user2" onclick="populateUserDropdown('user2')" required></select>
+        <label for="viewType">View Type:</label>
+        <select id="viewType" required>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+        </select>
 
         <button type="button" onclick="findOverlap()">Find Overlap</button>
     </form>
 
 
     <!-- Display Overlap Result -->
-    <h2>Result:</h2>
     <table id="overlapResultTable">
         <thead>
             <tr>
@@ -141,24 +134,10 @@
 
     <hr>
 
-    <!-- Get User Availability Form -->
-    <h2>Get User Availability</h2>
-    <form id="getAvailabilityForm">
-        <label for="getAvailabilityUserId">User ID:</label>
-        <select id="getAvailabilityUserId" onclick="populateUserDropdown('getAvailabilityUserId')" required></select>
-
-        <button type="button" onclick="getUserAvailability()">Get Availability</button>
-    </form>
-
-
-    <!-- Display Overlap Result -->
-    <h2>Result:</h2>
-    <pre id="getAvailabilityResult"></pre>
-
-    <hr>
-
     <script>
         let users = [];
+
+        let sessionUserId = null;
 
         const defaultWeekAvailability = [
             {
@@ -238,6 +217,8 @@
                 const data = await response.json();
                 console.log('POST /v1/user response:', data);
 
+                alert(`User ${data.id} Successfully Created!`);
+
                 await getAllUsers();
             } catch (error) {
                 console.error('Error creating user:', error);
@@ -245,12 +226,10 @@
         }
 
         async function getUserById() {
-            const userId = document.getElementById('userId').value;
-
             try {
-                const response = await fetch(`/v1/user/${userId}`);
+                const response = await fetch(`/v1/user/${sessionUserId}`);
                 const data = await response.json();
-                console.log(`GET /v1/user/${userId} response:`, data);
+                console.log(`GET /v1/user/${sessionUserId} response:`, data);
 
                 // Display user details
                 displayUserDetails(data);
@@ -263,18 +242,6 @@
             try {
                 const response = await fetch(`/v1/user`);
                 const data = await response.json();
-
-                // Display the list of users in the table
-                const userList = document.getElementById('userList');
-                userList.innerHTML = data.data.map(user => `
-                    <tr data-userid="${user.id}">
-                        <td>${user.id}</td>
-                        <td>${user.name}</td>
-                        <td>${user.email}</td>
-                    </tr>`).join('');
-
-                // Clear user details
-                clearUserDetails();
 
                 users = [];
 
@@ -290,7 +257,6 @@
 
         async function createUserAvailability() {
             const availabilityName = document.getElementById('availabilityName').value;
-            const availabilityUserId = document.getElementById('availabilityUserId').value;
             const availabilityWeek = JSON.parse(document.getElementById('availabilityWeek').value);
             const availabilityDate = JSON.parse(document.getElementById('availabilityDate').value);
 
@@ -300,24 +266,22 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ name: availabilityName, userId: availabilityUserId, week: availabilityWeek, date: availabilityDate }),
+                    body: JSON.stringify({ name: availabilityName, userId: sessionUserId, week: availabilityWeek, date: availabilityDate }),
                 });
 
                 const data = await response.json();
                 console.log('POST /v1/availability response:', data);
-                alert("User Availability Creation Success!");
+                alert(`Availability ${data.id} successfully created!`);
             } catch (error) {
                 console.error('Error creating user availability:', error);
             }
         }
 
         async function getUserAvailability() {
-            const userId = document.getElementById('getAvailabilityUserId').value;
-
             try {
-                const response = await fetch(`/v1/availability/user/${userId}`);
+                const response = await fetch(`/v1/availability/user/${sessionUserId}`);
                 const data = await response.json();
-                console.log(`GET /v1/availability/user/${userId} response:`, data);
+                console.log(`GET /v1/availability/user/${sessionUserId} response:`, data);
 
                 document.getElementById('getAvailabilityResult').textContent = JSON.stringify(data, null, 2);
 
@@ -326,39 +290,38 @@
             }
         }
 
-        // Function to show user details when clicking a row in the table
-        function showUserDetails(event) {
-            const selectedRow = event.target.closest('tr');
-            if (selectedRow) {
-                const userId = selectedRow.getAttribute('data-userid');
-                fetch(`/v1/user/${userId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        displayUserDetails(data);
-                    })
-                    .catch(error => {
-                        console.error('Error getting user details:', error);
-                    });
-            }
+        function setSessionUserId() {
+            const dropdown = document.getElementById('sessionUserId');
+            sessionUserId = dropdown.value;
+
+            const selectedUserId = document.getElementById('selectedUserId');
+
+            selectedUserId.textContent = `User ID: ${dropdown.value}`;
+
+            getUserById();
         }
 
         // Function to display user details in the "User Details" section
         function displayUserDetails(user) {
+            const selectedUserId = document.getElementById('selectedUserId');
             const selectedUserName = document.getElementById('selectedUserName');
             const selectedUserEmail = document.getElementById('selectedUserEmail');
 
+            selectedUserId.textContent = `User ID: ${user.id}`;
             selectedUserName.textContent = `Name: ${user.name}`;
             selectedUserEmail.textContent = `Email: ${user.email}`;
         }
 
-        // Function to clear user details in the "User Details" section
-        function clearUserDetails() {
-            const selectedUserName = document.getElementById('selectedUserName');
-            const selectedUserEmail = document.getElementById('selectedUserEmail');
+        // // Function to clear user details in the "User Details" section
+        // function clearUserDetails() {
+        //     const selectedUserId = document.getElementById('selectedUserId');
+        //     const selectedUserName = document.getElementById('selectedUserName');
+        //     const selectedUserEmail = document.getElementById('selectedUserEmail');
 
-            selectedUserName.textContent = 'Name: ';
-            selectedUserEmail.textContent = 'Email: ';
-        }
+        //     selectedUserId.textContent = `User ID: `;
+        //     selectedUserName.textContent = 'Name: ';
+        //     selectedUserEmail.textContent = 'Email: ';
+        // }
 
         async function populateUserDropdown(dropdownId) {
           const dropdown = document.getElementById(dropdownId);
@@ -374,8 +337,8 @@
         }
 
         async function findOverlap() {
-            const user1 = document.getElementById('user1').value;
             const user2 = document.getElementById('user2').value;
+            const viewType = document.getElementById('viewType').value;
 
             try {
                 const response = await fetch(`/v1/schedule/findOverlap`, {
@@ -383,7 +346,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ userIds: [user1, user2]}),
+                    body: JSON.stringify({ userIds: [sessionUserId, user2], type: viewType}),
                 });
 
                 const data = await response.json();

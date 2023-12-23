@@ -139,12 +139,12 @@ export class AvailabilityService implements IAvailabilityService {
       (dateSpecificSetting) => dateSpecificSetting.date === date
     );
 
-    if (weekAvailability && weekAvailability.intervals.length) {
+    if (weekAvailability && weekAvailability.intervals) {
       resultAvailability.intervals = weekAvailability.intervals;
     }
 
     // If date specific intervals available, override with it
-    if (dateAvailability && dateAvailability.intervals.length) {
+    if (dateAvailability && dateAvailability.intervals) {
       resultAvailability.intervals = dateAvailability.intervals;
     }
 
