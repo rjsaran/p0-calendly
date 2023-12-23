@@ -122,7 +122,7 @@ export class AvailabilityService implements IAvailabilityService {
     day: Moment,
     availability: Availability | null
   ): DateAvailabilityTime {
-    const weekDay = day.day();
+    const weekDay = day.isoWeekday();
     const date = day.format('YYYY-MM-DD');
 
     const resultAvailability = new DateAvailabilityTime();

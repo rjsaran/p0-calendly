@@ -77,9 +77,99 @@ http://127.0.0.1:3000
 
 Heroku Host:
 
-`sh
+```sh
 https://calendly-ec16681f4e77.herokuapp.com
-`
+```
+
+## Assumptions/Limitations:
+
+1. **Absence of Timezone Support**: Timezone support has not been implemented; the assumption is that all users are in a unified timezone.
+
+2. **Data Persistence Note**: Data persistence is currently unavailable; an in-memory repository is being utilized at the moment.
+
+3. **Absence of API Validations**: No API validations are in place; it is assumed that the client will send the data in the expected format.
+
+4. **Support for multiple availability options**: While users have the ability to create multiple availability options, the application defaults to using only the first option while finding overlap.
+
+5. **Overlap Finder**: The overlap finder operates in two modes: week and month. For example, in month mode, the API will provide all overlapping intervals between two users within the current month.
+
+6. **Time format**: Uses 24-hour time format; there is no AM/PM notation.
+
+7. **Week/Date availability**: The week availability parameter is utilized to set intervals for specific days of the week. The date availability parameter can override the week availability settings, and both parameters share the same data structure.
+
+For example, Raam is available on all weekdays from 09:00 AM to 05:00 PM and only available from 04:00 PM to 05:00 PM on January 1, 2024.
+
+Weekly Configuration:
+
+```json
+[
+  {
+    "intervals": [
+      {
+        "from": "09:00",
+        "to": "17:00"
+      }
+    ],
+    "weekDay": 1
+  },
+  {
+    "intervals": [
+      {
+        "from": "09:00",
+        "to": "17:00"
+      }
+    ],
+    "weekDay": 2
+  },
+  {
+    "intervals": [
+      {
+        "from": "09:00",
+        "to": "17:00"
+      }
+    ],
+    "weekDay": 3
+  },
+  {
+    "intervals": [
+      {
+        "from": "09:00",
+        "to": "17:00"
+      }
+    ],
+    "weekDay": 4
+  },
+  {
+    "intervals": [
+      {
+        "from": "09:00",
+        "to": "17:00"
+      }
+    ],
+    "weekDay": 5
+  }
+]
+```
+
+Here, weekDay represents the day of the week, where 1 is Monday, 2 is Tuesday, and so on, with 7 being Sunday.
+
+Date Configuration for 1 Jan 2024:
+
+```json
+[
+  {
+    "intervals": [
+      {
+        "from": "16:00",
+        "to": "17:00"
+      }
+    ],
+    "date": "2024-01-01"
+  }
+]
+```
+
+While calculating availability for a particular day, date-specific intervals will take precedence.
 
 ## Project Structure
 
@@ -206,15 +296,6 @@ date: List of date specific availability, overrides week availability
           "to": "14:00"
         }
       ],
-      "weekDay": 0
-    },
-    {
-      "intervals": [
-        {
-          "from": "09:00",
-          "to": "17:00"
-        }
-      ],
       "weekDay": 1
     },
     {
@@ -243,6 +324,15 @@ date: List of date specific availability, overrides week availability
         }
       ],
       "weekDay": 4
+    },
+    {
+      "intervals": [
+        {
+          "from": "09:00",
+          "to": "17:00"
+        }
+      ],
+      "weekDay": 5
     }
   ],
   "date": [
@@ -278,15 +368,6 @@ Response Body:
           "to": "12:00"
         }
       ],
-      "weekDay": 0
-    },
-    {
-      "intervals": [
-        {
-          "from": "09:00",
-          "to": "17:00"
-        }
-      ],
       "weekDay": 1
     },
     {
@@ -315,6 +396,15 @@ Response Body:
         }
       ],
       "weekDay": 4
+    },
+    {
+      "intervals": [
+        {
+          "from": "09:00",
+          "to": "17:00"
+        }
+      ],
+      "weekDay": 5
     }
   ],
   "date": [
@@ -356,15 +446,6 @@ Response Body:
           "to": "14:00"
         }
       ],
-      "weekDay": 0
-    },
-    {
-      "intervals": [
-        {
-          "from": "09:00",
-          "to": "17:00"
-        }
-      ],
       "weekDay": 1
     },
     {
@@ -393,6 +474,15 @@ Response Body:
         }
       ],
       "weekDay": 4
+    },
+    {
+      "intervals": [
+        {
+          "from": "09:00",
+          "to": "17:00"
+        }
+      ],
+      "weekDay": 5
     }
   ],
   "date": [
@@ -434,15 +524,6 @@ Response Body:
           "to": "14:00"
         }
       ],
-      "weekDay": 0
-    },
-    {
-      "intervals": [
-        {
-          "from": "09:00",
-          "to": "17:00"
-        }
-      ],
       "weekDay": 1
     },
     {
@@ -471,6 +552,15 @@ Response Body:
         }
       ],
       "weekDay": 4
+    },
+    {
+      "intervals": [
+        {
+          "from": "09:00",
+          "to": "17:00"
+        }
+      ],
+      "weekDay": 5
     }
   ],
   "date": [
@@ -503,7 +593,8 @@ userIds: Ids of user
 
 ```json
 {
-  "userIds": ["usr_202312221339245673", "usr_202312221339245674"]
+  "userIds": ["usr_202312221339245673", "usr_202312221339245674"],
+  "type": "monthly"
 }
 ```
 
@@ -601,15 +692,6 @@ Request Body:
           "to": "14:00"
         }
       ],
-      "weekDay": 0
-    },
-    {
-      "intervals": [
-        {
-          "from": "09:00",
-          "to": "17:00"
-        }
-      ],
       "weekDay": 1
     },
     {
@@ -638,6 +720,15 @@ Request Body:
         }
       ],
       "weekDay": 4
+    },
+    {
+      "intervals": [
+        {
+          "from": "09:00",
+          "to": "17:00"
+        }
+      ],
+      "weekDay": 5
     }
   ],
   "date": [
@@ -673,15 +764,6 @@ Response Body:
           "to": "12:00"
         }
       ],
-      "weekDay": 0
-    },
-    {
-      "intervals": [
-        {
-          "from": "09:00",
-          "to": "17:00"
-        }
-      ],
       "weekDay": 1
     },
     {
@@ -710,6 +792,15 @@ Response Body:
         }
       ],
       "weekDay": 4
+    },
+    {
+      "intervals": [
+        {
+          "from": "09:00",
+          "to": "17:00"
+        }
+      ],
+      "weekDay": 5
     }
   ],
   "date": [
